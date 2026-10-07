@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { Check, GripVertical, Plus, Search, X, Inbox, CalendarPlus } from 'lucide-react';
+import { GripVertical, Search, X, Inbox, CalendarPlus } from 'lucide-react';
 import type { Card } from '@shared/types';
 import type { TripSession, TripState } from '../data/store';
 import { TYPE_META } from '../lib/cardMeta';
@@ -178,11 +178,10 @@ function DrawerRow({ card, state, session, onOpen, onQuickAdd, suggested, fresh 
         {suggested ? (
           <>
             <button type="button" className="mini-btn" aria-label={`Skip ${card.title}`} onClick={() => { haptic(6); void session.swipe(card.id, 'rejected'); }}><X size={14} /></button>
-            <button type="button" className="mini-btn accent" aria-label={`Keep ${card.title}`} onClick={() => { haptic(8); void session.swipe(card.id, 'accepted'); }}><Check size={14} /></button>
           </>
         ) : null}
         <button type="button" className="mini-btn" aria-label={`Add ${card.title} to this day`} title="Add to the best slot of this day" data-testid="drawer-quick-add" onClick={() => onQuickAdd(card.id)}>
-          {suggested ? <Plus size={14} /> : <CalendarPlus size={14} />}
+          <CalendarPlus size={14} />
         </button>
       </div>
     </li>

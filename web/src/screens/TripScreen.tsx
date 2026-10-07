@@ -4,6 +4,7 @@ import { useStore, useTripSession, useTripState } from '../data/useTrip';
 import { navigate } from '../lib/router';
 import { formatDateRange } from '../lib/time';
 import { Spinner } from '../components/bits';
+import { coverFor } from '../lib/covers';
 import { PreferencesStep } from './PreferencesStep';
 import { SwipeStep } from './SwipeStep';
 import { ScheduleStep } from './ScheduleStep';
@@ -43,9 +44,16 @@ export function TripScreen({ tripId }: { tripId: string }) {
     if (s !== step) void session.updateTrip({ step: s });
   };
 
+  const cover = coverFor(state.trip.city);
+
   return (
     <div className={`trip-screen step-${step}`}>
-      <header className="trip-header">
+      {cover && step !== 'scheduling' ? (
+        <div className="trip-cover" style={{ backgroundImage: `url("${cover.url}")` }}>
+          <span className="trip-cover-credit">{cover.credit}</span>
+        </div>
+      ) : null}
+      <header className={`trip-header ${cover && step !== 'scheduling' ? 'on-cover' : ''}`}>
         <button type="button" className="icon-btn" onClick={() => navigate('/')} aria-label="Back to start"><ChevronLeft size={20} /></button>
         <div className="trip-title">
           <b>{state.trip.title || state.trip.city}</b>

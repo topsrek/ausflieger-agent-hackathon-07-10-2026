@@ -236,9 +236,11 @@ function SwipeCard({ card, state, days, depth, leaving, onSwipe, onOpen, onRetry
         </div>
         <span className="stamp stamp-like" style={{ opacity: likeOpacity }}>Keep</span>
         <span className="stamp stamp-skip" style={{ opacity: skipOpacity }}>Skip</span>
+        <div className="swipe-art-title">
+          <h3 className="swipe-title">{card.title}</h3>
+        </div>
       </div>
       <div className="swipe-body">
-        <h3 className="swipe-title">{card.title}</h3>
         {card.summary ? <p className="swipe-summary">{card.summary}</p> : null}
         <KeyFacts card={card} state={state} days={days} />
         <SourceChips sources={sources} />
