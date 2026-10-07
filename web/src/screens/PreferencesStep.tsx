@@ -131,11 +131,11 @@ export function PreferencesStep({ state, session }: { state: TripState; session:
         <div className="field-row">
           <label className="field">
             <span>From</span>
-            <input type="date" value={trip.start_date} onChange={(e) => e.target.value && void session.updateTrip({ start_date: e.target.value, ...(e.target.value > trip.end_date ? { end_date: e.target.value } : {}) })} />
+            <input type="date" lang="en-GB" value={trip.start_date} onChange={(e) => e.target.value && void session.updateTrip({ start_date: e.target.value, ...(e.target.value > trip.end_date ? { end_date: e.target.value } : {}) })} />
           </label>
           <label className="field">
             <span>To</span>
-            <input type="date" value={trip.end_date} min={trip.start_date} onChange={(e) => e.target.value && void session.updateTrip({ end_date: e.target.value })} />
+            <input type="date" lang="en-GB" value={trip.end_date} min={trip.start_date} onChange={(e) => e.target.value && void session.updateTrip({ end_date: e.target.value })} />
           </label>
         </div>
       </section>
@@ -157,7 +157,7 @@ export function PreferencesStep({ state, session }: { state: TripState; session:
                   </button>
                 ))}
               </div>
-              <input className="time-input" type="time" value={t.time} aria-label={`${label} time`} onChange={(e) => set({ ...t, time: e.target.value })} />
+              <input className="time-input" type="time" lang="en-GB" value={t.time} aria-label={`${label} time`} onChange={(e) => set({ ...t, time: e.target.value })} />
             </div>
           </div>
         ))}

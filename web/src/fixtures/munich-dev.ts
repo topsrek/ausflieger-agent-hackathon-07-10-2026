@@ -281,7 +281,7 @@ const hoursFact = (p: Place, url: string | null, evidence: Fact['evidence'] = 'r
   fact({ place_id: p.id, field: 'opening_hours', value: p.opening_hours, evidence, source_type: source, url: url ?? p.website_url, title: title ?? `${p.name} – opening hours` });
 
 const facts: Fact[] = [
-  fact({ holiday_id: 'h-unity', field: 'holiday', value: { date: '2027-10-03', name: 'Tag der Deutschen Einheit' }, evidence: 'operator_confirmed', source_type: 'holiday_calendar', url: 'https://www.bmi.bund.de/DE/themen/verfassung/staatliche-symbole/nationale-feiertage/nationale-feiertage-node.html', title: 'Federal Ministry of the Interior – public holidays', applies_from: '2027-10-03', applies_to: '2027-10-03' }),
+  fact({ holiday_id: 'h-unity', field: 'holiday', value: { date: '2027-10-03', name: 'German Unity Day' }, evidence: 'operator_confirmed', source_type: 'holiday_calendar', url: 'https://www.bmi.bund.de/DE/themen/verfassung/staatliche-symbole/nationale-feiertage/nationale-feiertage-node.html', title: 'Federal Ministry of the Interior – public holidays', applies_from: '2027-10-03', applies_to: '2027-10-03' }),
   hoursFact(places.deutsches, 'https://www.deutsches-museum.de/museumsinsel/besuch/oeffnungszeiten'),
   fact({ place_id: places.deutsches.id, field: 'last_entry', value: '16:00', evidence: 'regular_hours', source_type: 'official', url: 'https://www.deutsches-museum.de/museumsinsel/besuch/oeffnungszeiten', title: 'Deutsches Museum – visit' }),
   fact({ place_id: places.deutsches.id, field: 'special_hours', value: null, evidence: 'unknown', source_type: 'official', url: 'https://www.deutsches-museum.de/museumsinsel/besuch/oeffnungszeiten', applies_from: '2027-10-03', applies_to: '2027-10-03', note: 'Holiday hours for 2027 not yet published.' }),

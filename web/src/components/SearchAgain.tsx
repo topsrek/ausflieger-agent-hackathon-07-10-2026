@@ -64,8 +64,8 @@ export function SearchAgain({ days, onSearch, allowWindow, busy, initialWindow }
                   );
                 })}
               </div>
-              <label className="time-field">From <input type="time" value={win.start} onChange={(e) => setWin({ ...win, start: e.target.value })} /></label>
-              <label className="time-field">To <input type="time" value={win.end} onChange={(e) => setWin({ ...win, end: e.target.value })} /></label>
+              <label className="time-field">From <input type="time" lang="en-GB" value={win.start} onChange={(e) => setWin({ ...win, start: e.target.value })} /></label>
+              <label className="time-field">To <input type="time" lang="en-GB" value={win.end} onChange={(e) => setWin({ ...win, end: e.target.value })} /></label>
             </div>
           ) : null}
         </div>

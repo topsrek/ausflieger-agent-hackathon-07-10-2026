@@ -132,6 +132,8 @@ export function ScheduleStep({ state, session }: { state: TripState; session: Tr
         return;
       }
       if (data.from === 'day' && draggedIndex === slot && card.day === day) return; // unchanged
+      // Keep the drawer collapsed after pulling a card in, so the placed card stays visible.
+      if (data.from === 'drawer') setDrawer('peek');
       place(card, slot, check);
     }
   };

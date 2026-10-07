@@ -453,7 +453,7 @@ class LocalSession extends SessionBase implements TripSession {
           if (upload) this.setState((st) => ({ ...st, uploads: st.uploads.map((u) => (u.id === upload.id ? { ...u, status: 'parsing' } : u)) }));
           this.event(job, `Reading ${upload?.file_name ?? 'upload'}`);
         });
-        this.later(1600, () => this.event(job, 'Found a hotel booking: Hotel Torbräu, 02.–03.10.2027'));
+        this.later(1600, () => this.event(job, 'Found a hotel booking: Hotel Torbräu, 2–3 Oct 2027'));
         this.later(2800, () => {
           const hotel = this.seed.allPlaces.find((p) => p.id === this.seed.uploadCards[0]?.place_id);
           if (hotel && !this.s().places.some((p) => p.id === hotel.id)) {
