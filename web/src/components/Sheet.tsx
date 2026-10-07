@@ -62,7 +62,7 @@ export function Sheet({ open, onClose, title, children, labelledBy }: {
         >
           <span className="sheet-handle" />
         </div>
-        <button type="button" className="icon-btn sheet-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
+        <button type="button" data-testid="sheet-close" className="icon-btn sheet-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
         {title ? <div className="sheet-title">{title}</div> : null}
         <div className="sheet-body">{children}</div>
       </div>

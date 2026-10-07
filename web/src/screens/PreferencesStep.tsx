@@ -288,7 +288,7 @@ export function PreferencesStep({ state, session }: { state: TripState; session:
 
       <div className="sticky-cta">
         {unconfirmed.length ? <p className="cta-note">{unconfirmed.length} booking item{unconfirmed.length > 1 ? 's' : ''} still to confirm</p> : null}
-        <button type="button" className="btn btn-primary btn-lg btn-block" onClick={() => void submit()} disabled={submitting}>
+        <button type="button" className="btn btn-primary btn-lg btn-block" data-testid="find-suggestions" onClick={() => void submit()} disabled={submitting}>
           {submitting ? <Spinner /> : null} Find suggestions <ArrowRight size={18} />
         </button>
       </div>

@@ -37,7 +37,7 @@ export function Drawer({ state, session, size, setSize, dragging, draggingFrom, 
   }, [searchWindow, setSize]);
   useEffect(() => {
     if (size !== 'peek') setSeenAt(Date.now());
-  }, [size, state.cards.length]);
+  }, [size]);
 
   const unscheduled = useMemo(() => state.cards.filter((c) => c.swipe_status === 'accepted' && c.day == null).sort(byNewest), [state.cards]);
   const suggested = useMemo(() => state.cards.filter((c) => c.swipe_status === 'suggested').sort(byNewest), [state.cards]);
@@ -51,6 +51,7 @@ export function Drawer({ state, session, size, setSize, dragging, draggingFrom, 
   const startY = useRef<number | null>(null);
   const [dy, setDy] = useState(0);
   const onHandleDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
     startY.current = e.clientY;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
@@ -71,7 +72,7 @@ export function Drawer({ state, session, size, setSize, dragging, draggingFrom, 
     else if (d > 60) setSize(size === 'full' ? 'half' : 'peek');
   };
 
-  const effSize: DrawerSize = dragging && draggingFrom === 'drawer' ? 'peek' : size;
+  const effSize: DrawerSize = dragging ? 'peek' : size;
 
   return (
     <>
@@ -82,20 +83,20 @@ export function Drawer({ state, session, size, setSize, dragging, draggingFrom, 
         style={dy ? { transform: `translate(-50%, ${Math.max(-300, Math.min(300, dy))}px)`, transition: 'none' } : undefined}
         aria-label="More cards"
       >
-        <div className="drawer-head" onPointerDown={onHandleDown} onPointerMove={onHandleMove} onPointerUp={onHandleUp} onPointerCancel={() => { startY.current = null; setDy(0); }}>
+        <div className="drawer-head" data-testid="drawer-handle" onPointerDown={onHandleDown} onPointerMove={onHandleMove} onPointerUp={onHandleUp} onPointerCancel={() => { startY.current = null; setDy(0); }}>
           <span className="sheet-handle" />
           <div className="drawer-head-row">
             {draggingFrom === 'day' ? (
               <span className="drawer-drop-hint"><Inbox size={16} /> Drop here to move back to the drawer</span>
             ) : (
               <>
-                <button type="button" className="drawer-title" onClick={() => setSize(size === 'peek' ? 'half' : 'peek')} aria-expanded={size !== 'peek'}>
+                <button type="button" data-testid="drawer-toggle" className="drawer-title" onClick={() => setSize(size === 'peek' ? 'half' : 'peek')} aria-expanded={size !== 'peek'}>
                   <b>More cards</b>
                   <span className="count-badge">{total}</span>
                   {fresh.length ? <span className="new-badge" key={fresh.length}>{fresh.length} new</span> : null}
                   {searching ? <span className="live-dot" title="Agent is searching" /> : null}
                 </button>
-                <button type="button" className="chip-btn" onPointerDown={(e) => e.stopPropagation()} onClick={() => { setShowSearch((s) => !s); if (size === 'peek') setSize('half'); }}>
+                <button type="button" data-testid="drawer-search" className="chip-btn" onPointerDown={(e) => e.stopPropagation()} onClick={() => { setShowSearch((s) => !s); if (size === 'peek') setSize('half'); }}>
                   <Search size={14} /> Search again
                 </button>
               </>
@@ -163,7 +164,7 @@ function DrawerRow({ card, state, session, onOpen, onQuickAdd, suggested, fresh 
   const windowDay = card.metadata?.preferred_day as string | undefined;
   return (
     <li className={`drawer-row ${isDragging ? 'is-ghost' : ''} ${fresh ? 'is-fresh' : ''}`}>
-      <div ref={setNodeRef} className="drawer-row-main" {...attributes} {...listeners} role="button" tabIndex={0}
+      <div ref={setNodeRef} data-testid="drawer-card" data-card-id={card.id} data-title={card.title} className="drawer-row-main" {...attributes} {...listeners} role="button" tabIndex={0}
         onClick={() => onOpen(card.id)} aria-roledescription="draggable card" aria-label={`${card.title}. Drag into the day or tap for details.`}>
         <CardArt card={card} size="sm" />
         <div className="drawer-row-text">
@@ -180,7 +181,7 @@ function DrawerRow({ card, state, session, onOpen, onQuickAdd, suggested, fresh 
             <button type="button" className="mini-btn accent" aria-label={`Keep ${card.title}`} onClick={() => { haptic(8); void session.swipe(card.id, 'accepted'); }}><Check size={14} /></button>
           </>
         ) : null}
-        <button type="button" className="mini-btn" aria-label={`Add ${card.title} to this day`} title="Add to the best slot of this day" onClick={() => onQuickAdd(card.id)}>
+        <button type="button" className="mini-btn" aria-label={`Add ${card.title} to this day`} title="Add to the best slot of this day" data-testid="drawer-quick-add" onClick={() => onQuickAdd(card.id)}>
           {suggested ? <Plus size={14} /> : <CalendarPlus size={14} />}
         </button>
       </div>

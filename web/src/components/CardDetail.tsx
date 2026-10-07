@@ -45,7 +45,10 @@ export function formatFactValue(f: Fact): string {
     if (WD.some((d) => d in o)) return summariseHours(o as OpeningHours);
     if ('name' in o && 'date' in o) return `${String(o.name)} (${String(o.date)})`;
     if ('from' in o && 'to' in o) return `${String(o.from)} → ${String(o.to)}`;
-    return JSON.stringify(v);
+    return Object.entries(o).map(([k, x]) => {
+      const val = x && typeof x === 'object' ? (Array.isArray(x) ? x.map((y) => (y && typeof y === 'object' ? Object.values(y as object).join('–') : String(y))).join(', ') : Object.values(x as object).join(' ')) : String(x);
+      return `${k.replace(/_/g, ' ')}: ${/^\d{2}:\d{2}:\d{2}$/.test(val) ? val.slice(0, 5) : val}`;
+    }).join(' · ');
   }
   return String(v);
 }

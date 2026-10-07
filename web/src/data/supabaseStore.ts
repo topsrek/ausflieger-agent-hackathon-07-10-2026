@@ -10,6 +10,9 @@ import { SessionBase, jobInputFrom, makeCard, makeJob } from './base';
 import { nowIso, uuid } from '../lib/ids';
 import { toast } from '../lib/toast';
 
+/** Prepared Munich demo trip (data/demo/munich.json). Overridable via DEMO_TRIP_ID / VITE_DEMO_TRIP_ID. */
+export const DEFAULT_DEMO_TRIP_ID = '2027a10d-0203-4000-8000-00000000c0de';
+
 const REALTIME_TABLES: TableName[] = [
   'cards', 'places', 'facts', 'travel_times', 'research_jobs', 'card_change_proposals', 'agent_events',
 ];
@@ -60,7 +63,7 @@ export class SupabaseStore implements TripStore {
   }
 
   async openDemo(name: string): Promise<string> {
-    let demoId = this.demoTripId;
+    let demoId = this.demoTripId || (name === 'munich' || !name ? DEFAULT_DEMO_TRIP_ID : '');
     if (!demoId) {
       const { data, error } = await this.client.from('trips').select('id').eq('is_demo', true)
         .ilike('city', `%${name || 'munich'}%`).order('created_at', { ascending: false }).limit(1);

@@ -206,7 +206,7 @@ export function ScheduleStep({ state, session }: { state: TripState; session: Tr
             const c = countIssues(daySchedules[i].issues);
             const hol = state.holidays.find((h) => h.date === d);
             return (
-              <button key={d} type="button" role="tab" aria-selected={d === day} className={`day-tab ${d === day ? 'on' : ''}`} onClick={() => { haptic(5); setDay(d); }}>
+              <button key={d} type="button" role="tab" data-testid="day-tab" data-day={d} aria-selected={d === day} className={`day-tab ${d === day ? 'on' : ''}`} onClick={() => { haptic(5); setDay(d); }}>
                 <span className="day-tab-wd">{f.weekday}</span>
                 <span className="day-tab-d">{f.day}</span>
                 <span className="day-tab-m">{f.month}</span>
@@ -291,6 +291,17 @@ export function ScheduleStep({ state, session }: { state: TripState; session: Tr
         />
       </div>
 
+      {active && hoverSlot != null && checks[hoverSlot] ? (
+        <div className={`drag-hint sev-${checks[hoverSlot].severity ?? 'ok'}`} role="status">
+          {checks[hoverSlot].severity === 'blocker' ? <AlertOctagon size={16} /> : checks[hoverSlot].severity === 'warning' ? <AlertTriangle size={16} /> : checks[hoverSlot].severity === 'needs_checking' ? <HelpCircle size={16} /> : <CheckCircle2 size={16} />}
+          <span>
+            {checks[hoverSlot].severity === 'blocker' ? <b>Can’t go here. </b> : preview ? <b>{preview.start}–{preview.end} </b> : null}
+            {checks[hoverSlot].issues[0]?.message ?? 'Fits with all known constraints'}
+          </span>
+        </div>
+      ) : null}
+      {active && overId === 'drawer' && active.from === 'day' ? <div className="drag-hint sev-ok" role="status"><span>Release to move it back to the drawer</span></div> : null}
+
       <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(.2,.8,.2,1)' }}>
         {activeCard ? (
           <div className={`tl-card drag-overlay ${hoverSlot != null && checks[hoverSlot]?.severity ? `sev-${checks[hoverSlot].severity}` : ''}`}>
@@ -374,7 +385,7 @@ function DropSlot({ slot, check, isOver, preview, current, last }: {
   const Icon = sev ? SLOT_ICON[sev] : CheckCircle2;
   const reason = check?.issues[0]?.message;
   return (
-    <li ref={setNodeRef} className={`drop-slot ${sev ? `sev-${sev}` : 'sev-ok'} ${isOver ? 'is-over' : ''} ${current ? 'is-current' : ''} ${last ? 'is-last' : ''}`}>
+    <li ref={setNodeRef} data-testid="drop-slot" data-slot={slot} data-severity={sev ?? 'ok'} className={`drop-slot ${sev ? `sev-${sev}` : 'sev-ok'} ${isOver ? 'is-over' : ''} ${current ? 'is-current' : ''} ${last ? 'is-last' : ''}`}>
       <div className="drop-slot-inner">
         <Icon size={14} aria-hidden="true" />
         <span className="drop-slot-text">

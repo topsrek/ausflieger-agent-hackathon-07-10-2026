@@ -59,6 +59,7 @@ export function TripScreen({ tripId }: { tripId: string }) {
             key={s.id}
             type="button"
             className={`step-pill ${i === stepIdx ? 'current' : ''} ${i < stepIdx ? 'done' : ''}`}
+            data-testid={`step-${s.id}`}
             aria-current={i === stepIdx ? 'step' : undefined}
             onClick={() => goto(s.id)}
           >

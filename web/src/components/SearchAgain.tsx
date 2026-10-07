@@ -36,9 +36,10 @@ export function SearchAgain({ days, onSearch, allowWindow, busy, initialWindow }
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search again, e.g. “more indoor activities”"
           aria-label="Search again"
+          data-testid="search-input"
           enterKeyHint="search"
         />
-        <button type="submit" className="btn btn-primary btn-sm" disabled={busy}>Search</button>
+        <button type="submit" data-testid="search-submit" className="btn btn-primary btn-sm" disabled={busy}>Search</button>
       </div>
       <div className="search-ideas">
         {IDEAS.map((idea) => (
@@ -48,7 +49,7 @@ export function SearchAgain({ days, onSearch, allowWindow, busy, initialWindow }
       {allowWindow ? (
         <div className={`search-window ${useWindow ? 'on' : ''}`}>
           <label className="switch-row">
-            <input type="checkbox" checked={useWindow} onChange={(e) => setUseWindow(e.target.checked)} />
+            <input type="checkbox" data-testid="search-window-toggle" checked={useWindow} onChange={(e) => setUseWindow(e.target.checked)} />
             <CalendarClock size={16} aria-hidden="true" />
             <span>For a free time window</span>
           </label>

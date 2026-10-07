@@ -151,7 +151,9 @@ export class LocalStore implements TripStore {
       holidays: retarget(b.holidays, id),
       facts: retarget(b.facts, id),
       travel_times: retarget(b.travel_times, id),
-      uploads: [], jobs: [], proposals: [], events: [],
+      uploads: retarget(((b as unknown as { uploads?: TripState['uploads'] }).uploads ?? []), id),
+      jobs: [], proposals: [],
+      events: retarget(((b as unknown as { agent_events?: TripState['events'] }).agent_events ?? []), id),
     };
     this.seeds.set(id, seed);
     this.persist(id, { state, queue: retarget(seed.queue, id) });

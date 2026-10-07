@@ -48,7 +48,7 @@ export function Landing() {
     <main className="landing">
       <div className="landing-hero">
         <div className="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 48 48" width="44" height="44"><path d="M24 3 43 22 24 45 5 22Z" fill="var(--accent)" /><path d="M24 3v42M5 22h38" stroke="#fff" strokeWidth="2.2" opacity=".85" /><path d="M24 45c-3 4-7 2-9 0" stroke="var(--coral)" strokeWidth="2.4" fill="none" strokeLinecap="round" /></svg>
+          <img src="/favicon.svg" width="44" height="44" alt="" />
         </div>
         <p className="eyebrow">Ausflieger</p>
         <h1 className="display">Trip plans that<br /><span className="hl">actually fit.</span></h1>
@@ -56,11 +56,11 @@ export function Landing() {
       </div>
 
       <div className="landing-actions">
-        <button type="button" className="btn btn-primary btn-lg btn-block" onClick={() => void openDemo('munich')} disabled={!store || !!busy}>
+        <button type="button" className="btn btn-primary btn-lg btn-block" data-testid="open-demo" onClick={() => void openDemo('munich')} disabled={!store || !!busy}>
           {busy === 'demo' ? <Spinner /> : <Sparkles size={18} />} Open the Munich demo
           <span className="btn-sub">2–3 Oct 2027 · Oktoberfest · German Unity Day</span>
         </button>
-        <button type="button" className="btn btn-ghost btn-lg btn-block" onClick={() => void startNew()} disabled={!store || !!busy}>
+        <button type="button" className="btn btn-ghost btn-lg btn-block" data-testid="new-trip" onClick={() => void startNew()} disabled={!store || !!busy}>
           {busy === 'new' ? <Spinner /> : <ArrowRight size={18} />} Start a new trip
         </button>
       </div>

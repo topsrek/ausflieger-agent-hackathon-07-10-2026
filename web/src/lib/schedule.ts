@@ -108,13 +108,13 @@ export function autoPlace(s: TripState): Placement[] {
       const checks = slotChecks(bundle, card.id, day);
       const load = dayCards(bundle, day).length;
       checks.forEach((c, pos) => {
-        const sev = c.severity ? SEVERITY_RANK[c.severity] : 0;
-        const score = sev * 100 + c.issues.length * 5 + load;
+        const sevScore = c.severity === 'blocker' ? 1000 : c.severity === 'warning' ? 60 : c.severity === 'needs_checking' ? 15 : 0;
+        const score = sevScore + c.issues.length * 4 + load * 30;
         if (!best || score < best.score) best = { day, pos, score };
       });
     }
     const chosen = best as { day: string; pos: number; score: number } | null;
-    if (!chosen || chosen.score >= 300) continue; // only blockers: leave in drawer
+    if (!chosen || chosen.score >= 1000) continue; // only blockers: leave in drawer
     const sMoved: TripState = { ...s, ...bundle } as TripState;
     const moves = placementsForMove(sMoved, card.id, chosen.day, chosen.pos);
     const map = new Map(moves.map((m) => [m.id, m]));

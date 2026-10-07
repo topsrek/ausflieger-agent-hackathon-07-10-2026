@@ -125,15 +125,15 @@ export function SwipeStep({ state, session }: { state: TripState; session: TripS
       </div>
 
       <div className="swipe-controls">
-        <button type="button" className="round-btn sm" onClick={undo} disabled={!history.length} aria-label="Undo last swipe"><Undo2 size={18} /></button>
-        <button type="button" className="round-btn lg skip" onClick={() => deck[0] && swipe(deck[0], -1)} disabled={!deck[0] || !!leaving} aria-label="Skip"><X size={28} strokeWidth={2.6} /></button>
-        <button type="button" className="round-btn lg like" onClick={() => deck[0] && swipe(deck[0], 1)} disabled={!deck[0] || !!leaving} aria-label="Keep"><Heart size={26} strokeWidth={2.4} fill="currentColor" /></button>
-        <button type="button" className="round-btn sm" onClick={() => deck[0] && setDetail(deck[0])} disabled={!deck[0]} aria-label="Details"><Info size={18} /></button>
+        <button type="button" className="round-btn sm" data-testid="swipe-undo" onClick={undo} disabled={!history.length} aria-label="Undo last swipe"><Undo2 size={18} /></button>
+        <button type="button" data-testid="swipe-skip" className="round-btn lg skip" onClick={() => deck[0] && swipe(deck[0], -1)} disabled={!deck[0] || !!leaving} aria-label="Skip"><X size={28} strokeWidth={2.6} /></button>
+        <button type="button" data-testid="swipe-like" className="round-btn lg like" onClick={() => deck[0] && swipe(deck[0], 1)} disabled={!deck[0] || !!leaving} aria-label="Keep"><Heart size={26} strokeWidth={2.4} fill="currentColor" /></button>
+        <button type="button" className="round-btn sm" onClick={() => deck[0] && setDetail(deck[0])} disabled={!deck[0]} data-testid="swipe-info" aria-label="Details"><Info size={18} /></button>
       </div>
 
       <div className="swipe-footer">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSearchOpen(true)}><Search size={15} /> Search again</button>
-        <button type="button" className="btn btn-primary" onClick={() => void goSchedule()} disabled={liked.length === 0 && !state.cards.some((c) => c.day)}>
+        <button type="button" data-testid="open-search" className="btn btn-ghost btn-sm" onClick={() => setSearchOpen(true)}><Search size={15} /> Search again</button>
+        <button type="button" className="btn btn-primary" data-testid="plan-days" onClick={() => void goSchedule()} disabled={liked.length === 0 && !state.cards.some((c) => c.day)}>
           Plan my days <ArrowRight size={17} />
         </button>
       </div>
@@ -216,6 +216,8 @@ function SwipeCard({ card, state, days, depth, leaving, onSwipe, onOpen, onRetry
 
   return (
     <div
+      data-testid={top ? 'swipe-card-top' : 'swipe-card'}
+      data-title={card.title}
       className={`swipe-card ${top ? 'is-top' : ''} ${drag ? 'dragging' : ''} ${leaving ? 'leaving' : ''}`}
       style={{ transform, zIndex: 10 - depth, opacity: depth > 2 ? 0 : 1 }}
       onPointerDown={onDown}

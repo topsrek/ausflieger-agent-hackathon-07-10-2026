@@ -79,8 +79,8 @@ export function ProposalBanner({ proposal, state, session, compact }: {
             </div>
           ) : null}
           <div className="proposal-actions">
-            <button type="button" className="btn btn-sm btn-ghost" onClick={() => resolve(false)}><X size={14} /> Keep current</button>
-            <button type="button" className={`btn btn-sm ${blockers ? 'btn-warn' : 'btn-primary'}`} onClick={() => resolve(true)}><Check size={14} /> Apply change</button>
+            <button type="button" className="btn btn-sm btn-ghost" data-testid="proposal-keep" onClick={() => resolve(false)}><X size={14} /> Keep current</button>
+            <button type="button" className={`btn btn-sm ${blockers ? 'btn-warn' : 'btn-primary'}`} data-testid="proposal-apply" onClick={() => resolve(true)}><Check size={14} /> Apply change</button>
           </div>
         </div>
       ) : null}

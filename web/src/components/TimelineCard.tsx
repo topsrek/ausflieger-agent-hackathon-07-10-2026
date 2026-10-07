@@ -32,7 +32,7 @@ export function TimelineCardBody({ card, item, state, overlay }: { card: Card; i
           {dur > 0 ? <span>· {formatDuration(dur)}</span> : null}
           {card.price_text && !overlay ? <span className="tl-price">· {card.price_text}</span> : null}
         </div>
-        {card.research_state !== 'ready' ? <ResearchBadge state={card.research_state} compact /> : null}
+        {card.research_state === 'pending' || card.research_state === 'researching' || card.research_state === 'failed' ? <ResearchBadge state={card.research_state} compact /> : null}
         {!overlay && issues.length ? (
           <div className="tl-issues">
             <IssueLine issue={issues[0]} />
@@ -60,7 +60,7 @@ export const TimelineCard = memo(function TimelineCard({ card, item, state, sess
     const dur = card.duration_minutes ?? 15;
     const set = (m: number) => { haptic(5); void session.updateCard(card.id, { duration_minutes: Math.max(5, Math.min(240, m)) }); };
     return (
-      <div ref={setNodeRef} className={`tl-buffer ${isDragging || dimmed ? 'is-ghost' : ''}`} {...attributes} {...listeners} aria-roledescription="draggable buffer">
+      <div ref={setNodeRef} data-testid="schedule-buffer" data-card-id={card.id} className={`tl-buffer ${isDragging || dimmed ? 'is-ghost' : ''}`} {...attributes} {...listeners} aria-roledescription="draggable buffer">
         <Hourglass size={14} aria-hidden="true" />
         <span className="tl-buffer-label">Buffer</span>
         <div className="tl-buffer-ctrl" onPointerDown={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
@@ -77,6 +77,9 @@ export const TimelineCard = memo(function TimelineCard({ card, item, state, sess
     <div className={`tl-card-wrap ${isDragging || dimmed ? 'is-ghost' : ''}`}>
       <div
         ref={setNodeRef}
+        data-testid="schedule-card"
+        data-card-id={card.id}
+        data-title={card.title}
         className={`tl-card ${locked ? 'is-fixed' : ''} ${sev ? `sev-${sev}` : ''} rs-${card.research_state}`}
         onClick={() => onOpen(card.id)}
         onKeyDown={(e) => { if (e.key === 'Enter') onOpen(card.id); }}
