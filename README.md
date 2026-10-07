@@ -1,164 +1,215 @@
-# Ausflieger
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/logo-dark.svg">
+    <img src="brand/logo.svg" alt="Ausflieger" width="360">
+  </picture>
+</p>
 
-**Agentic trip planning focused on schedule coordination.**
-Agent Hackathon, 07.10.2026.
+<p align="center"><b>A trip planner with an agent that checks whether your schedule actually works, and tells you why when it doesn't.</b></p>
 
-> Status: building.
+<p align="center">
+  <a href="https://prod-main-web-c3f29b-00kqxs6r2dz.compute.instacloud-edge.com">Live demo</a> ·
+  Video (coming soon) ·
+  <a href="#how-it-works">Architecture</a>
+</p>
 
-## Idea
+Agent Hackathon, 07.10.2026. Mobile-first, English only. Open the live demo on a phone or in your browser's mobile view.
 
-The user describes a trip: upload travel documents (tickets, hotel bookings, PDFs) or just enter times and key facts, by train or plane. An agent researches everything needed and builds a small mobile web app made of **cards** (UI cards, not maps). Each card is one item in the plan: arrival, hotel, breakfast, museum, restaurant, bar, departure, …
+---
 
-The core value is **schedule coordination**: every card knows its own metadata (opening hours, duration, estimated travel time, fixed times). The user can reorder cards in a calendar view, and the app checks whether the order fits the known constraints and estimates. If a spot doesn't work, the app says why ("Museum closes at 17:00"). Unknown or conflicting facts are shown as **needs checking**, rather than presented as definitely possible or impossible.
+## What it does
 
-**Mobile-first, English only.** The demo runs on a laptop in mobile view.
+You describe a trip (destination, dates, arrival and departure, a booking PDF, a few preferences). A research agent finds sights, museums, restaurants, bars and events for those dates. You swipe through the suggestions, and the accepted ones become **cards** in a one-day-at-a-time schedule.
 
-## Flow (multi-step)
+**The conflict manager is the core.** Every slot is checked against:
 
-### Step 1: City and preferences
-- Destination, dates, arrival and departure (train / plane / car)
-- Uploads: PDFs, tickets, booking confirmations, screenshots
-- Extracted booking dates and times are shown for confirmation before becoming locked appointments
-- Preferences, asked as quick questions or captured from free text:
-  - Approximate meal times (breakfast, lunch, dinner)
-  - Nightlife: important or not
-  - Interests: museums, culture, nature, shopping, food, …
-  - **Visit style: short / normal / long (thorough).** This sets the default duration for museums and sights.
-  - Pace (relaxed vs. packed)
+- opening hours for that exact date, including midday breaks and **last entry**
+- **fixed appointments**: trains, show times, reservations
+- **walking-time ranges** between places (the check uses the upper bound plus a buffer)
+- **public holidays** (national, regional, city). A holiday triggers a check for that venue's special hours. It never implies the venue is closed.
+- meal-time preferences and booking time windows
 
-### Step 2: Activity suggestions (swipe)
-- The agent searches broadly: sights, museums, restaurants, bars, **event calendars and event planners** for the trip dates
-- Suggestions appear as cards the user **swipes Tinder-style** (right = want, left = skip)
-- New suggestions **stream in live** while the agent keeps researching
+When a slot doesn't work, the app says why: *"Visit ends at 18:40, after Residenz München closes at 18:00."* When a fact is unknown, unconfirmed or contradicted by another source, the card is marked **needs checking**. It is never shown as definitely possible or definitely impossible.
 
-### Step 3: Schedule (calendar of cards)
-- Accepted cards receive planning-critical research (metadata below) and are placed into a day-by-day calendar; missing or conflicting facts remain visible
-- The user fine-tunes the plan with drag & drop
+## How it works
 
-### User-triggered search
-- A **Search again** action is available in the suggestions view and the calendar drawer
-- The user can refine the request, e.g. "more indoor activities", "a cheaper dinner", or "something near the hotel tomorrow afternoon"
-- The agent searches using the current trip, preferences and, when relevant, the available time window
-- New suggestions stream into the swipe deck or drawer; existing selections and the user's schedule are preserved
-- Refreshing an existing card's research is explicit. Changes affecting scheduled cards are shown with their impact for the user to accept; the agent does not silently move cards
-- Search progress, completion and failure are visible; failed searches can be retried
+1. **Trip and preferences.** City, dates, arrival and departure, uploads (booking times extracted from a PDF stay unconfirmed until you confirm them), meal times, interests, pace and visit style (short / normal / long, which sets default visit durations).
+2. **Swipe.** Suggestions stream into a Tinder-style deck while the agent keeps researching. Right = want, left = skip.
+3. **Schedule.** Accepted cards get planning-critical research and are placed into days. Drag & drop to reorder. Every drop target shows its severity *before* you drop, and times are recalculated in the browser. A bottom drawer holds unscheduled and alternative cards. **Search again** ("more indoor activities", "something near the hotel tomorrow afternoon") adds new suggestions without touching the current plan.
 
-## Cards and their metadata
+```mermaid
+flowchart LR
+  subgraph Browser["Web app on InstaCloud (Vite + React)"]
+    UI["Swipe deck · one-day schedule · drawer"]
+    P["planner/<br/>deterministic checks<br/>(runs in the browser)"]
+    UI <--> P
+  end
 
-Each card carries the facts needed for planning and reordering. Research planning-critical facts first; optional details can follow. Unknown values stay explicit.
+  subgraph SB["Supabase"]
+    DB[("Postgres<br/>trips · cards · places · facts<br/>holidays · travel_times · proposals")]
+    RJ[["research_jobs"]]
+    RT{{"Realtime"}}
+    ST[("Storage<br/>uploaded PDFs")]
+  end
 
-| Field | Example |
+  subgraph A37["Agent 37"]
+    OC["OpenClaw agent<br/>research system prompt"]
+    SUB["Subagents<br/>(one card each, max 5)"]
+    CLI["ausflieger CLI<br/>validates every write"]
+  end
+
+  MON["Monid<br/>tool discovery + run"]
+  CTX["Context.dev<br/>official pages → structured JSON"]
+
+  UI -- "insert job" --> RJ
+  UI -- "upload" --> ST
+  RJ -- "webhook / cron poll" --> OC
+  OC --> SUB
+  OC --> MON
+  OC --> CTX
+  SUB --> MON
+  SUB --> CTX
+  OC --> CLI
+  SUB --> CLI
+  CLI -- "validated writes" --> DB
+  DB --> RT
+  RT -- "new cards, facts, progress" --> UI
+```
+
+- The **agent supplies facts with evidence**. The **planner decides feasibility**. The planner is pure TypeScript, has no I/O and runs on the client, so reordering is instant and needs no API calls.
+- The prepared demo and the live agent use the same card schema (`shared/types.ts`) and the same planner.
+- Agent internals, triggering and CLI rules: [agent/README.md](agent/README.md).
+
+## Sponsors & tools used
+
+| Tool | What it does in Ausflieger |
 |---|---|
-| Type | arrival, hotel, meal, sight, museum, activity, event, nightlife, departure |
-| Location / address / coordinates | Bahnhofstrasse 1, 8001 Zürich |
-| Opening hours (per weekday, incl. exceptions) | Tue–Sun 10:00–18:00, closed Mon |
-| Duration | editable estimate based on visit style (short/normal/long), refined by sourced information when available |
-| Fixed or flexible | train 08:32 = **fixed**; museum visit = flexible |
-| Time window | hotel breakfast 07:00–10:30 |
-| Constraint kind | hard: booked train; preference: dinner around 19:00; assumption: estimated visit duration |
-| Estimated travel time | walk 15–25 min; planning uses the upper bound |
-| Hotel-specific | breakfast yes/no + hours, dinner yes/no, check-in/check-out |
-| Reservation needed? | yes, table from 19:00 |
-| Price | CHF 25 entry |
-| **Sources** | official website **and/or** Google Maps, shown on the card with links |
-| Evidence per fact | operator-confirmed for the trip date / supported by regular hours / estimated / unknown / conflicting; source URL, retrieval time and applicable dates |
-| Research state | suggestion / researching / ready / needs checking / failed |
+| **[Agent 37](https://agent37.com)** | Hosts the research agent (`agent37-openclaw` template). The same OpenClaw instance also deployed the web app to InstaCloud. |
+| **OpenClaw** | Agent runtime. The research system prompt (`agent/workspace/AGENTS.md`), a research skill, **subagents** (`sessions_spawn`) that research accepted cards in parallel, and browser automation as a last resort for pages that need clicks. |
+| **[Monid](https://monid.ai)** | Tool discovery (`discover` → `inspect` → `run`) for everything except official-page reading: places and coordinates, Google Maps hours as a second source, web and event search, holiday APIs, PDF parsing, trains and flights. Working provider/endpoint pairs are remembered. |
+| **Context.dev** | Preferred way to read official venue, hotel, tourism-board and event-calendar pages, including JS-heavy ones. JSON-schema extraction turns them into opening hours, last entry, breakfast times and similar structured facts. |
+| **[Supabase](https://supabase.com)** | Postgres schema (trips, cards, places, fact-level evidence, holidays, travel matrix, research jobs, change proposals, agent events), a `fact_status` view that derives `conflicting`, **Realtime** to stream cards and progress into the app, **Storage** for uploads, an Edge Function (`trigger-agent`) that wakes the agent when a job is inserted, and the researched Munich demo seed. |
+| **[InstaCloud](https://www.instacloud.com)** | Hosts the web app (root `Dockerfile`, small Node server with `/api/health` and runtime Supabase config). Deployed by the OpenClaw agent following [deploy/OPENCLAW_DEPLOY.md](deploy/OPENCLAW_DEPLOY.md). |
+
+## Research rules
+
+The research system prompt gets most of the tuning effort. Full text: [agent/workspace/AGENTS.md](agent/workspace/AGENTS.md).
+
+- **Planning impact first.** Fixed times, date-specific hours, closures and last entry come first. Location, duration, reservation and price come next, descriptions last. Each tier is written as soon as it is done, and every step has a tool-call budget, so usable cards arrive early.
+- **Authoritative, date-specific sources.** The operator's page for the trip date beats generic listings.
+- **Two sources for critical facts** (usually the official page plus Google Maps or the city portal) where available, not for every fact. Source count alone doesn't establish confidence: authority, freshness and date applicability are recorded too.
+- **Disagreement is kept, not resolved.** Both claims are stored as separate facts, and the database derives `conflicting`.
+- **Holidays are always checked** at national, regional and city level. A holiday triggers a check for special hours. It does **not** imply closure: only documented exceptions override regular hours. If holiday hours can't be confirmed, they are marked needs checking.
+- **Event calendars** (city tourism, venues, event planners) are scraped for the trip dates. Seasonal hours and special closures are also checked.
+- **Never invent values.** Every sourced fact stores its URL, retrieval time and applicable dates. Estimates carry their basis.
+- **Evidence levels per fact:** `operator_confirmed` (for the trip date) · `regular_hours` · `estimated` · `unknown` · `conflicting` (derived).
+- **Write rules enforced by the CLI:** the agent cannot set day, position or swipe status, and cannot confirm bookings. On a scheduled card, changes to duration, times or place become **proposals** that the user accepts or rejects. The agent never silently moves a card. Sourced facts need a URL, `operator_confirmed` needs an operator source, and no reference may cross trips.
 
 ## Planning rules
 
-- **Hard constraints**: confirmed bookings, fixed event times, known opening windows and documented closures. A visit must fit entirely within an opening window, including any last-entry restriction
-- **Preferences**: approximate meal times, pace and interests. Deviations are explained but do not automatically block a slot
-- **Assumptions**: estimated visit durations and travel-time ranges. These are labelled, editable and used conservatively for planning
-- Missing or conflicting critical facts produce **needs checking**. A slot without a known conflict is not automatically verified; users can keep provisional cards with a visible warning
-- The research agent supplies structured facts and evidence. Deterministic client-side logic checks the schedule using those facts and assumptions
+Implemented in [planner/](planner/README.md).
 
-## Research rules (system prompt)
+- **Hard constraints** (blockers): confirmed bookings, fixed event times, documented closures, opening windows. A visit must fit **entirely** inside an opening interval and start no later than last entry.
+- **Preferences** (warnings): meal times, booking windows marked as preference. Deviations are explained but don't block.
+- **Assumptions**: visit durations (from visit style or sourced information) and walking-time ranges. They are labelled and editable, and they are used conservatively: the travel gap is the range's upper bound plus a 15-minute buffer. A missing pair falls back to 30 minutes and is flagged.
+- **Needs checking**: unknown hours, unconfirmed holiday hours, conflicting sources, unconfirmed bookings. A slot without a known conflict is not automatically "verified". Provisional cards can stay with a visible warning.
+- Fixed cards are locked. Flexible cards wait for their window or the next opening interval (for example after a midday break). Dropping a card also reports what it breaks *later* in the day, such as a train that becomes unreachable.
 
-The system prompt is critical for research and gets most of the research tuning effort. It defines source priorities, structured output, uncertainty handling and research limits; schedule feasibility is checked separately by the planning logic.
+## Demo: Munich during Oktoberfest 2027
 
-- **Prioritize by planning impact**: fixed times, date-specific opening hours, closures and last-entry restrictions come before prices or descriptive details. Bound optional research by a time/tool-call budget so usable cards arrive early
-- **Prefer authoritative, date-specific sources**: operator or venue information for the actual trip date takes precedence over generic listings. Use a second independent source for critical facts where available, rather than requiring two sources for every fact
-- If sources disagree, retain both claims and flag the affected fact. Source count alone does not establish confidence; record authority, freshness and date applicability
-- **Always check applicable public holidays** for the trip dates at national, regional/canton/state and city levels, using authoritative calendars where available. A holiday triggers a check for venue-specific special hours; it does **not** imply closure. Only documented exceptions override regular hours. If holiday hours cannot be confirmed, mark them as needing checking
-- **Scrape event calendars** (city tourism sites, venue calendars, event planners) for the trip dates.
-- Check seasonal hours and special closures.
-- **Restaurants**: start with venue information and a small set of relevant local recommendations. Comprehensive restaurant-guide, magazine, blog and influencer research is deferred beyond the MVP
-- **Recommendations** in general: use local tourism boards and relevant travel guides. Model knowledge can suggest candidates, but current planning facts require research
-- Store the source URL, retrieval time and applicable dates for every sourced fact. Label estimates and their basis explicitly; never invent missing values
+**Sat 2 – Sun 3 Oct 2027**, the last weekend of the Wiesn. Sun 3 Oct is German Unity Day *and* the last Wiesn day. The data was researched on 2026-10-07 from official sites and the city portal: 108 facts, each with a source or an estimation basis. Details and sources: [data/README.md](data/README.md).
 
-## Calendar view and reordering
-
-- On mobile, show **one day at a time** with a day selector: start, arrival, cards in order, **estimated travel-time ranges and buffers** between them
-- Travel gaps use the upper bound of the cached travel-time estimate plus a default buffer. Rest breaks are separate cards
-- **Buffers are cards too**: editable in minutes in the MVP; pinch and drag-to-resize gestures are deferred
-- **Fixed cards** (booked trains, flights, reservations) are locked
-- **Flexible cards** can be dragged. Known hard conflicts are blocked or highlighted with the reason; preference deviations and uncertain facts receive distinct warnings. Holiday handling uses venue-specific exceptions, not a blanket closure rule
-- After reordering, all times are recalculated instantly in the browser
-
-### Bottom drawer
-- Swipe-up drawer with **more cards**: accepted but unscheduled cards, alternatives, events
-- Cards are dragged **from the drawer into the calendar** and back
-- **Live**: while the agent works, new cards keep arriving in the drawer
-- **Search again**: request more alternatives or a search for a selected free time window without replacing the current plan
-
-## Travel time matrix
-
-For now, travel times are **estimated ranges**, not exact routing promises: e.g. walking 15–25 minutes. Store the mode, estimation basis and range, display the range, and use its upper bound for schedule checks plus any separate buffer.
-
-Precompute/cache estimates between selected places, extending the matrix as cards become ready. Reordering between cached places needs no new API calls, so checks run instantly on the client. Missing estimates are marked as needing checking. The MVP uses walking estimates only; exact, departure-time-dependent public transport routing and multiple transport modes are deferred.
-
-## Architecture (planned)
-
-- **[Agent 37](https://agent37.com)**: cloud platform where the agent runs, using the **`agent37-openclaw`** template with Monid set up. OpenClaw brings browser automation (for JS-heavy pages like Google Maps and event calendars) and **subagents** (`sessions_spawn`) to research many cards in parallel. The agent picks up queued `research_jobs` and writes cards, places, facts and travel times to Supabase.
-- **[Monid](https://monid.ai)**: tool library with 1900+ tools/APIs. For each research task the agent calls `discover` to find the best tool and `run` to execute it. Examples:
-  - Train connection → transit/timetable tool
-  - Flight → flight tool
-  - Opening hours, typical visit duration → Google Maps / Places tool + website scraping
-  - Hotel breakfast, dinner, check-in → search / scraping tool
-  - Public holidays, events → search / scraping tools
-  - Travel times → estimated ranges, optionally informed by a routing tool (cached matrix)
-  - PDF uploads → PDF parsing tool
-- **[Supabase](https://supabase.com)** (sponsor):
-  - Postgres: trips, preferences, cards, fact-level evidence, research jobs, estimated travel matrix, schedule
-  - **Realtime**: streams new cards from the agent to the frontend (swipe deck, drawer)
-  - Storage: uploaded PDFs and tickets
-- **[InstaCloud](https://www.instacloud.com)** (sponsor): hosts the web app. Two entry points: the **demo app with prepared data** (Munich) and **real requests** that trigger the agent.
-- **Frontend**: mobile-first web app. Swipe deck, one-day calendar of cards, bottom drawer, drag & drop, user-triggered search, client-side constraint checks and uncertainty warnings.
-
-## Hackathon MVP
-
-- **One city: Munich**, two days, about eight activities plus fixed arrival/departure cards
-- One PDF upload (hotel booking), with extracted dates/times confirmed by the user
-- Preferences → streamed suggestions → swipe → schedule → reorder with clear conflict explanations
-- Walking-time ranges, editable visit durations, default buffers and a one-day mobile calendar
-- User-triggered searches add alternatives while preserving the user's plan
-- Prepared data and the live agent use the same card schema and planning logic
-- First integration milestone: research one real card → validate its structured facts → store it in Supabase → show it live → explain a conflict when it is moved
-
-## Hackathon demo
-
-- **Prepared demo: Munich, 02.–03.10.2027**, within Oktoberfest 2027 (18.09.–03.10.2027), two days, about eight activities. Shows the metadata and constraint checks. 03.10. is German Unity Day and the last day of the Wiesn: check each venue's actual holiday hours rather than assuming closure. Future hours that are not yet published remain marked as needing checking
-- **Live demo: the same Munich trip**, train arrival and one hotel PDF. Run preferences → swipe → schedule and request new alternatives from the drawer
-- Demonstrate a sourced closing-time or fixed-appointment conflict. Use a holiday-closure example only if the venue's closure for that exact date is documented
-- Keep a saved research run as a **clearly labelled fallback** if live research is slow or unavailable; it uses the same UI and planning logic
-
-### Video (2 minutes)
-
-| Time | Content |
+| Sat 2 Oct | Sun 3 Oct (holiday) |
 |---|---|
-| 0:00–0:15 | Problem: trip plans break on opening hours, holidays and travel times |
-| 0:15–0:35 | Step 1: Munich, Oktoberfest dates, preferences, upload hotel PDF |
-| 0:35–0:55 | Step 2: swipe suggestions while new cards stream in |
-| 0:55–1:30 | Step 3: calendar, drag a card to an invalid slot ("Visit ends after the museum closes at 17:00"), pull a card from the drawer, request new alternatives |
-| 1:30–1:50 | Under the hood: research system prompt, agent on Agent 37 picks tools via Monid, prioritized sources and fact-level evidence, cards stored in Supabase, deterministic schedule checks |
-| 1:50–2:00 | Live on InstaCloud, try Munich yourself. End card: **QR code + short link** to the demo, visible for at least 5 seconds |
+| 09:16 ICE arrival (fixed) | 07:30 Breakfast at Hotel Uhland (07:30–10:00 window) |
+| Drop luggage at Hotel Uhland | Check out (from PDF, unconfirmed) |
+| 11:00 Glockenspiel (fixed show time) | 09:00 Oktoberfest, last day |
+| Frauenkirche & south tower | 12:00 Böllerschießen at the Bavaria (fixed, two sources) |
+| Lunch at Weisses Bräuhaus | Lunch in a Wiesn tent |
+| Viktualienmarkt (sources disagree → needs checking) | Alte Pinakothek (open until 18:00 on 3 Oct per muenchen.de) |
+| Residenz München (last entry 17:00) | 18:32 ICE departure (fixed) |
+| Check in (from PDF, unconfirmed) · Dinner at Augustiner-Keller | |
 
-The QR code and short link are created once the InstaCloud URL is final. Use a short link we control, so it can be redirected if the deployment URL changes.
+The prepared plan has **no blockers**. Its needs-checking items are intended: unconfirmed hotel booking times, undocumented luggage storage and conflicting market hours. The drawer holds the Deutsches Museum, Schumann's and the Englischer Garten. "Search again" streams more suggestions into the deck.
+
+**Showcase conflicts** (each one is asserted against the real planner in `data/scripts/plan-check.mjs`):
+
+| Move | The app says |
+|---|---|
+| Residenz after the hotel check-in | "Visit ends at 18:40, after Residenz München closes at 18:00" |
+| Deutsches Museum from the drawer after the Residenz | "Visit starts at 17:57, after Deutsches Museum closes at 17:00" |
+| Frauenkirche before the Glockenspiel | "Ends at 11:34; can't reach Glockenspiel at Marienplatz at 11:00 in time" |
+| Viktualienmarkt onto Sun 3 Oct | Closed: market stalls closing on 3 Oct 2027 is **documented** by the city, so this is a real closure and not an assumption |
+| Deutsches Museum onto Sun 3 Oct | "Opening hours on 3 Oct (German Unity Day) are not confirmed" → needs checking, not closed |
+
+The last two moves show the holiday rule: a closure is shown only when it is documented, and otherwise the hours are marked unconfirmed.
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| [`web/`](web/README.md) | Vite + React + TypeScript app: landing, preferences, swipe deck, schedule with drag & drop (@dnd-kit), drawer, proposals. `TripStore` with an offline `LocalStore` and a Supabase store. `server.mjs` serves the build on InstaCloud. |
+| [`planner/`](planner/README.md) | Deterministic schedule checks: `scheduleDay`, `checkPlacement`, opening hours, holidays, travel gaps. No dependencies, 62 tests. |
+| [`shared/types.ts`](shared/types.ts) | Single card, place, fact and job schema used by the web app, planner, agent CLI and demo data. |
+| [`agent/`](agent/README.md) | OpenClaw workspace (`AGENTS.md` research prompt, `ausflieger-research` skill, heartbeat), the validating `ausflieger` CLI (`tools/`, zod + supabase-js) and `install.sh`. |
+| [`supabase/`](supabase/) | Migration (schema, RLS, `fact_status` view, `clone_trip` RPC, Realtime, storage bucket), generated `seed.sql`, one-shot `setup.sql`, `trigger-agent` Edge Function. |
+| [`data/`](data/README.md) | Researched Munich dataset: generator script (source of truth), `demo/munich.json`, demo hotel PDF, plan and DB verification scripts. |
+| [`deploy/`](deploy/) | Step-by-step instructions the OpenClaw agent follows to deploy to InstaCloud and connect Supabase. |
+| `brand/` | Logo (light, dark, mark). |
+| `video/` | Submission video sources (Remotion). |
+| `Dockerfile` | Builds `web/` (with `planner/` and `shared/`) for InstaCloud. |
+
+## Run locally
+
+Node 20+.
+
+```sh
+# Web app, offline demo mode (no keys needed): real researched Munich data, simulated agent
+cd web && npm install && npm run dev        # http://localhost:5173, then "Open the Munich demo" or /?demo=munich
+
+# Planner tests (62)
+cd planner && npm install && npm test
+
+# Agent CLI tests: schema validation, walking estimates, integration against the real migration in PGlite
+cd agent/tools && npm install && npm test
+
+# Schema test: runs the Supabase migration in PGlite (from the repo root)
+npm install && npm run test:schema
+
+# Demo data: rebuild and verify (typecheck, plan-check, seed in PGlite)
+cd data && npm install && npm run build && npm run check
+```
+
+In offline mode, everything runs in the browser with the prepared bundle. A simulated agent streams cards, "researches" accepted cards, parses an upload into unconfirmed booking cards and proposes one change. To use Supabase, set `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (see [web/README.md](web/README.md)).
+
+## Deploy
+
+- **Supabase:** run `supabase/setup.sql` (schema + Munich seed) in the SQL editor, or use `supabase/migrations/` + `seed.sql`.
+- **Web app on InstaCloud:** [deploy/OPENCLAW_DEPLOY.md](deploy/OPENCLAW_DEPLOY.md). Only the anon key goes to the web app.
+- **Agent on Agent 37 + Supabase wiring:** [deploy/OPENCLAW_SUPABASE.md](deploy/OPENCLAW_SUPABASE.md) and [agent/README.md](agent/README.md) (install, `.env` with the service role key on the instance only, webhook or cron triggering).
+
+## Status & limitations
+
+**Working and verified**
+- Web app live on InstaCloud, deployed by the OpenClaw agent on Agent 37.
+- Supabase project with the schema and the researched Munich seed.
+- Offline demo with real researched data: swipe, schedule, drag & drop with conflict explanations, drawer, Search again, proposals.
+- Planner (62 tests), agent CLI test suite (including integration against the real migration), schema test, demo plan and seed verification.
+
+**Implemented or designed, but not proven end to end live**
+- Live research jobs triggered from the app (app → `research_jobs` → agent → CLI → Realtime). Every piece exists: the Supabase store, the Edge Function, the cron fallback, the CLI and the research prompt. The full loop from the deployed app has not been demonstrated yet, and open questions about Agent 37 / OpenClaw triggering are listed in [agent/README.md](agent/README.md#open-questions-agent-37--openclaw).
+- Live PDF parsing through Monid. In offline mode, PDF parsing is simulated.
+
+**Known limitations**
+- 2027 train times and some 2027 holiday hours are not published yet. They are marked `estimated` or `unknown` rather than guessed.
+- Travel times are walking estimates (haversine × 1.3 detour, 4.5–5 km/h), not routing.
+- No authentication. Demo trips are cloned per visitor through `clone_trip`. RLS keeps the seeded demo trip read-only; other trips are open to anyone who knows their id.
+- One city (Munich), two days.
 
 ## Out of scope (for now)
 
-- Showing cost of tool calls in the frontend
-- Pinch-to-resize and drag-to-resize buffers
+- Showing tool-call cost in the frontend
+- Pinch-to-resize and drag-to-resize buffers (buffers are editable in minutes)
 - Comprehensive restaurant-guide, magazine, blog and influencer research
 - Exact public transport routing and multiple transport modes
-- Additional demo cities and longer trips
+- More demo cities and longer trips

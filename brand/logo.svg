@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" width="360" height="80" role="img" aria-label="Ausflieger">
+  <!-- Mark + wordmark. The wordmark uses Fraunces (fallback Georgia); outline the text in a vector editor for print. -->
+  <style>
+    .word { fill: #1d1a16; font-family: Fraunces, Georgia, "Times New Roman", serif; font-weight: 700; font-size: 46px; letter-spacing: -0.5px; }
+    @media (prefers-color-scheme: dark) { .word { fill: #f6f3ee; } }
+  </style>
+  <g transform="translate(8 8)">
+    <rect width="64" height="64" rx="15" fill="#0f6b5c"/>
+    <path d="M33 31 C 27 36, 21 39, 15 47" fill="none" stroke="#9fe3d2" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0.1 5.2"/>
+    <rect x="24.5" y="33" width="9" height="7" rx="2" fill="#f6f3ee"/>
+    <rect x="9" y="44" width="11" height="9" rx="2.4" fill="#ff9f5a"/>
+    <path d="M55 9 L21 22 L33 27 Z" fill="#f6f3ee"/>
+    <path d="M55 9 L33 27 L39 41 Z" fill="#cdeee5"/>
+    <path d="M33 27 L35 34 L39 41 Z" fill="#0a4f44" opacity=".55"/>
+  </g>
+  <text class="word" x="88" y="56">Ausflieger</text>
+</svg>
