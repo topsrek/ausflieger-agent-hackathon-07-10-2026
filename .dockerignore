@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+.git
+video
+brand
+agent
+supabase
+scripts

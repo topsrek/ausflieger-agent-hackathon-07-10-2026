@@ -15,8 +15,8 @@ If the folder already exists: `git -C ausflieger pull`.
 
 Fetch https://instacloud.com/prompt.md and follow it, with these project-specific answers:
 
-- What to deploy: **only the `web/` folder**. It is a Vite + React app with a small Node server (`web/server.mjs`) that serves the built app and `/api/health`, and reads runtime config from env.
-- Build: `npm ci && npm run build` inside `web/`. Start: `npm start`. The server listens on `$PORT` (default 8080).
+- What to deploy: the **repo root, using the `Dockerfile`** there. It builds the Vite + React app in `web/` (which imports `planner/` and `shared/`) and runs the small Node server `web/server.mjs` (serves the app, `/api/health`, runtime config from env).
+- Port 8080 (`$PORT`). If InstaCloud cannot build Dockerfiles, build manually: `cd web && npm ci && npx vite build && npm start` (needs the whole repo checked out).
 - No InstaCloud database needed: data lives in Supabase.
 - No volumes, no workers.
 - Project name: `ausflieger`.
@@ -35,7 +35,7 @@ Never bind the service role key to the web app. The service role key is only for
 ## 4. Deploy and verify
 
 ```bash
-cd web
+# from the repo root
 insta deploy .
 insta status
 insta agent manifest   # prints the public URL
@@ -51,5 +51,5 @@ Report the public URL back to the user. The video's QR code and short link point
 ## Redeploy after changes
 
 ```bash
-cd ausflieger && git pull && cd web && insta deploy .
+cd ausflieger && git pull && insta deploy .
 ```
