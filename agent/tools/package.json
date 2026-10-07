@@ -1,0 +1,25 @@
+{
+  "name": "ausflieger-agent-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Validated Supabase write CLI for the Ausflieger research agent (OpenClaw on Agent 37).",
+  "type": "module",
+  "bin": {
+    "ausflieger": "bin/ausflieger.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "cli": "node bin/ausflieger.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "vitest": "^3.2.4"
+  }
+}
