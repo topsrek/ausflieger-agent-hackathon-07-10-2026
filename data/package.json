@@ -1,0 +1,19 @@
+{
+  "name": "ausflieger-data",
+  "private": true,
+  "type": "module",
+  "description": "Prepared demo dataset (Munich, 2–3 Oct 2027) and generators",
+  "scripts": {
+    "build": "node scripts/build-demo.mjs && node scripts/build-seed.mjs && node scripts/build-pdf.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "plan-check": "node scripts/plan-check.mjs",
+    "verify": "node scripts/verify.mjs",
+    "check": "npm run typecheck && npm run plan-check && npm run verify"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}
