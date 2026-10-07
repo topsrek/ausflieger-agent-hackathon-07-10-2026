@@ -1,0 +1,21 @@
+{
+  "name": "ausflieger",
+  "version": "1.0.0",
+  "scripts": {
+    "test:schema": "node scripts/test-schema.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/topsrek/ausflieger-agent-hackathon-07-10-2026.git"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/topsrek/ausflieger-agent-hackathon-07-10-2026/issues"
+  },
+  "homepage": "https://github.com/topsrek/ausflieger-agent-hackathon-07-10-2026#readme",
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "supabase": "^2.120.0"
+  },
+  "private": true
+}
