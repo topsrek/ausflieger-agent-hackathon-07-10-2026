@@ -1,0 +1,31 @@
+{
+  "name": "ausflieger-video",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Programmatic 2-minute submission video for Ausflieger (ElevenLabs voiceover, Playwright app recording, Remotion composition).",
+  "scripts": {
+    "check": "node scripts/check-script.mjs",
+    "qr": "node scripts/make-qr.mjs",
+    "vo": "node scripts/voiceover.mjs",
+    "vo:placeholder": "node scripts/placeholder-audio.mjs",
+    "record": "node scripts/record-app.mjs",
+    "studio": "remotion studio remotion/src/index.ts --public-dir remotion/public",
+    "render": "remotion render remotion/src/index.ts Ausflieger out/ausflieger.mp4 --public-dir remotion/public --codec h264 --crf 18",
+    "still": "remotion still remotion/src/index.ts Ausflieger out/still.png --public-dir remotion/public",
+    "typecheck": "tsc --noEmit -p remotion/tsconfig.json"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.534",
+    "playwright": "^1.64.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.534"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}

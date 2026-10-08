@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, pointerWithin, rectIntersection, useDroppable,
+  DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, MouseSensor, TouchSensor, pointerWithin, rectIntersection, useDroppable,
   useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent,
 } from '@dnd-kit/core';
 import { AlertOctagon, HelpCircle, AlertTriangle, CheckCircle2, Plus, Sparkles, Search, PartyPopper } from 'lucide-react';
@@ -24,6 +24,10 @@ interface SlotCheck {
   severity: IssueSeverity | null;
   issues: ScheduleIssue[];
 }
+
+// Re-measure droppables during the drag: the drawer shrinks to peek and drop slots mount after the drag starts,
+// so rects measured at drag start would let the (formerly half-open) drawer swallow drops on the lower slots.
+const measuring = { droppable: { strategy: MeasuringStrategy.Always } };
 
 const collision: CollisionDetection = (args) => {
   const hits = pointerWithin(args);
@@ -200,7 +204,7 @@ export function ScheduleStep({ state, session }: { state: TripState; session: Tr
   };
 
   return (
-    <DndContext sensors={sensors} collisionDetection={collision} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={reset}>
+    <DndContext sensors={sensors} measuring={measuring} autoScroll={active?.from !== 'drawer'} collisionDetection={collision} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={reset}>
       <div className={`schedule ${active ? 'is-dragging' : ''}`}>
         <div className="day-tabs" role="tablist" aria-label="Days">
           {days.map((d, i) => {

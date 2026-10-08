@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.*
+!.env.example
+out/
+# generated media (regenerate with npm run vo / vo:placeholder / record)
+remotion/public/vo/
+remotion/public/clips/

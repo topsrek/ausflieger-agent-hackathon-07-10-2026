@@ -1,0 +1,14 @@
+{
+  "name": "ausflieger-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:deployed": "E2E_BASE_URL=https://prod-main-web-c3f29b-00kqxs6r2dz.compute.instacloud-edge.com playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0"
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "title": "Ausflieger: 2-minute submission video",
+  "wpm": 150,
+  "maxSeconds": 120,
+  "fps": 30,
+  "voice": {
+    "model_id": "eleven_multilingual_v2",
+    "voice_settings": {
+      "stability": 0.5,
+      "similarity_boost": 0.75,
+      "style": 0.15,
+      "use_speaker_boost": true,
+      "speed": 1
+    }
+  },
+  "segments": [
+    {
+      "id": "s01-intro",
+      "label": "Intro: what Ausflieger is",
+      "targetStart": 0,
+      "targetDuration": 11,
+      "padAfter": 0.4,
+      "text": "Meet Ausflieger. That's German for the one who heads out on a trip. An agent researches your city, and the app makes sure your day actually works.",
+      "onScreen": "Logo animates in with the name and pun ('Ausflug' + 'Flieger'). Phone on the right: the planned Saturday (ICE arrival 09:16, Glockenspiel, Frauenkirche, lunch, Residenz…) scrolling.",
+      "visual": {
+        "kind": "intro",
+        "shot": "S01"
+      }
+    },
+    {
+      "id": "s02-hook",
+      "label": "Hook: the problem",
+      "targetStart": 10,
+      "targetDuration": 9,
+      "padAfter": 0.4,
+      "text": "Because plans break on details. The palace closes at six, the market is shut on the holiday, and your train leaves at 18:32.",
+      "onScreen": "Phone: Residenz München is dragged after hotel check-in; the slot turns red with 'Visit ends at 18:40, after Residenz München closes at 18:00'; card snaps back. Right side: three fact chips pop in on the matching words.",
+      "visual": {
+        "kind": "problem",
+        "shot": "S02"
+      },
+      "beats": [
+        {
+          "word": "palace",
+          "text": "Residenz closes 18:00",
+          "tone": "red"
+        },
+        {
+          "word": "market",
+          "text": "Viktualienmarkt closed on 3 Oct",
+          "tone": "red"
+        },
+        {
+          "word": "train",
+          "text": "ICE leaves 18:32",
+          "tone": "dark"
+        }
+      ]
+    },
+    {
+      "id": "s03-step1",
+      "label": "Step 1: trip and preferences",
+      "targetStart": 19,
+      "targetDuration": 15,
+      "padAfter": 0.3,
+      "text": "Step one: Munich, October second and third. I add my train, pick museums and food, and drop in my hotel booking. The extracted times come back for me to confirm.",
+      "onScreen": "Preferences step (Munich, 2–3 Oct 2027, train prefilled): upload the hotel PDF, extracted Hotel Uhland times appear, tap 'Confirm all'; tap Museums, Food, Beer gardens; visit style Normal; tap 'Find suggestions'.",
+      "visual": {
+        "kind": "clip",
+        "shot": "S03"
+      },
+      "chapter": "1 · Trip & preferences",
+      "beats": [
+        {
+          "word": "train",
+          "text": "Fixed: ICE arrives 09:16"
+        },
+        {
+          "word": "hotel",
+          "text": "Hotel PDF → check-in, breakfast, check-out"
+        },
+        {
+          "word": "confirm.",
+          "text": "You confirm before it is locked"
+        }
+      ]
+    },
+    {
+      "id": "s04-step2",
+      "label": "Step 2: swipe while cards stream in",
+      "targetStart": 34,
+      "targetDuration": 13,
+      "padAfter": 0.3,
+      "text": "Step two: an agent researches in the background. Suggestions stream in while I swipe, right to keep, left to skip, each with hours, duration and sources.",
+      "onScreen": "Swipe deck: swipe right, right, left on the streamed suggestions (Pinakothek der Moderne, Climb the Alter Peter, Hofbräuhaus, Olympiaturm); research badges show ready / needs checking; tap 'Plan my days'.",
+      "visual": {
+        "kind": "clip",
+        "shot": "S04"
+      },
+      "chapter": "2 · Swipe suggestions",
+      "beats": [
+        {
+          "word": "agent",
+          "text": "Agent researches in the background"
+        },
+        {
+          "word": "stream",
+          "text": "New cards stream in live"
+        },
+        {
+          "word": "sources.",
+          "text": "Hours · duration · sources"
+        }
+      ]
+    },
+    {
+      "id": "s05-calendar",
+      "label": "Step 3: calendar",
+      "targetStart": 47,
+      "targetDuration": 9,
+      "padAfter": 0.2,
+      "text": "Step three: the calendar. Every card knows its opening hours, last entry, duration, and the walking time to the next stop.",
+      "onScreen": "Day view Sat 2 Oct: cards with times and walking-range chips between them. Tap Residenz München: facts with evidence and source links (sheet).",
+      "visual": {
+        "kind": "clip",
+        "shot": "S05"
+      },
+      "chapter": "3 · Schedule",
+      "beats": [
+        {
+          "word": "opening",
+          "text": "Opening hours"
+        },
+        {
+          "word": "last",
+          "text": "Last entry"
+        },
+        {
+          "word": "duration,",
+          "text": "Duration"
+        },
+        {
+          "word": "walking",
+          "text": "Walk 10–15 min"
+        }
+      ]
+    },
+    {
+      "id": "s06-conflict",
+      "label": "The conflict moment",
+      "targetStart": 56,
+      "targetDuration": 18,
+      "padAfter": 0.5,
+      "text": "I drag the Residenz after hotel check-in, and it tells me why that fails: the visit would end after the palace closes at six. Sunday is German Unity Day. That doesn't mean closed, it means check. Where hours aren't confirmed, the card says: needs checking.",
+      "onScreen": "Drag Residenz München below 'Check in at Hotel Uhland'; red slot + reason; release, card snaps back with a toast. Switch to Sun 3 Oct (Holiday tab): open Alte Pinakothek, special holiday hours 10:00–18:00 with source; needs-checking badges visible.",
+      "visual": {
+        "kind": "clip",
+        "shot": "S06"
+      },
+      "beats": [
+        {
+          "word": "fails:",
+          "text": "Can’t go here: visit ends after Residenz München closes at 18:00",
+          "tone": "red"
+        },
+        {
+          "word": "Unity",
+          "text": "Sun 3 Oct · German Unity Day",
+          "tone": "dark"
+        },
+        {
+          "word": "check.",
+          "text": "Holiday → check special hours, not “closed”",
+          "tone": "amber"
+        },
+        {
+          "word": "needs",
+          "text": "Needs checking",
+          "tone": "amber"
+        }
+      ],
+      "chapter": "3 · The conflict"
+    },
+    {
+      "id": "s07-search",
+      "label": "Search again",
+      "targetStart": 74,
+      "targetDuration": 13,
+      "padAfter": 0.3,
+      "text": "Want something indoors? Search again. My plan stays put, new cards stream into the drawer, and when I drag one in, every time recalculates instantly.",
+      "onScreen": "Drawer: tap 'Search again', type 'more indoor activities', Search; new cards stream into the drawer; drag the newest one into the free slot after lunch; times below shift.",
+      "visual": {
+        "kind": "clip",
+        "shot": "S07"
+      },
+      "beats": [
+        {
+          "word": "Search",
+          "text": "“more indoor activities”"
+        },
+        {
+          "word": "stream",
+          "text": "New cards stream into the drawer"
+        },
+        {
+          "word": "recalculates",
+          "text": "Times recalculate instantly"
+        }
+      ],
+      "chapter": "Search again"
+    },
+    {
+      "id": "s08-architecture",
+      "label": "Under the hood",
+      "targetStart": 87,
+      "targetDuration": 19,
+      "padAfter": 0.5,
+      "text": "Under the hood: Agent 37 runs our OpenClaw agent and deployed the app. Its subagents research cards in parallel, Monid picks the best tool per task, and Context.dev scrapes official pages. Supabase stores and streams the cards, InstaCloud hosts the app, and a deterministic planner checks your day.",
+      "onScreen": "Architecture slide; boxes highlight in sync with the voiceover (Agent 37/OpenClaw → subagents → Monid / Context.dev → Supabase → planner in browser).",
+      "visual": {
+        "kind": "architecture"
+      },
+      "beats": [
+        {
+          "word": "OpenClaw",
+          "key": "agent"
+        },
+        {
+          "word": "subagents",
+          "key": "subagents"
+        },
+        {
+          "word": "Monid",
+          "key": "tools"
+        },
+        {
+          "word": "Supabase",
+          "key": "supabase"
+        },
+        {
+          "word": "InstaCloud",
+          "key": "planner"
+        }
+      ]
+    },
+    {
+      "id": "s085-market",
+      "label": "Business model",
+      "targetStart": 105,
+      "targetDuration": 7,
+      "padAfter": 0.3,
+      "text": "How we'd grow: freemium for travelers, white-label for tourism boards and hotels, and affiliate fees on bookable tickets.",
+      "onScreen": "Slide: three cards (Travelers: freemium · Tourism boards & hotels: white-label · Bookable activities: affiliate).",
+      "visual": {
+        "kind": "market"
+      },
+      "beats": [
+        {
+          "word": "freemium",
+          "key": "0"
+        },
+        {
+          "word": "white-label",
+          "key": "1"
+        },
+        {
+          "word": "affiliate",
+          "key": "2"
+        }
+      ]
+    },
+    {
+      "id": "s09-end",
+      "label": "End card",
+      "targetStart": 106,
+      "targetDuration": 9,
+      "minDuration": 8,
+      "padAfter": 2.5,
+      "text": "Ausflieger is live on InstaCloud. Scan the code and plan your Munich weekend.",
+      "onScreen": "End card: logo, one-line pitch, QR code and short link, sponsor row. Held for at least 5 seconds after the voiceover.",
+      "visual": {
+        "kind": "endcard"
+      }
+    }
+  ]
+}
